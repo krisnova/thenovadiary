@@ -1,0 +1,14 @@
+#!/bin/bash
+####################################
+#####
+###
+##
+#
+#
+# Startup Script for the Application
+####################################
+set -e
+. _lib.sh
+RootCheck
+echo "Starting [TheNovaDiary]"
+

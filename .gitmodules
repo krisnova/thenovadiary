@@ -1,0 +1,3 @@
+[submodule "app/photoprism"]
+	path = app/photoprism
+	url = https://github.com/photoprism/photoprism
