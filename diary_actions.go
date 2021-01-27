@@ -27,6 +27,9 @@ type Action func(diary *Diary) error
 func DailyPhotoTweet(diary *Diary) error {
 	logger.Debug("Running DailyPhotoTweet")
 
+	// Connecting to Google Photos
+	// Looking on disk for a local filestore
+
 	//
 	// TODO Nova start twitter implementation here!
 	//
