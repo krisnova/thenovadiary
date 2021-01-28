@@ -15,14 +15,17 @@ echo "Starting [TheNovaDiary]"
 # Mount the SSHFS ZFS volume
 sshfs novix@nivenly.com:Pictures /home/nova/AlicePictures
 
-docker run \
-  -d \
+docker run -d \
   --name photoprism \
   --security-opt seccomp=unconfined \
   --security-opt apparmor=unconfined \
   -p 8081:2342 \
   -e PHOTOPRISM_UPLOAD_NSFW="true" \
-  -e PHOTOPRISM_ADMIN_PASSWORD="charlie" \
+  -e PHOTOPRISM_DATABASE_DRIVER="mysql" \
+  -e PHOTOPRISM_DATABASE_SERVER="10.0.0.188"\
+  -e PHOTOPRISM_DATABASE_NAME="novaphotos"\
+  -e PHOTOPRISM_DATABASE_USER="photoprism"\
+  -e PHOTOPRISM_DATABASE_PASSWORD="charlie"\
   -v /home/nova/AlicePictures \
   photoprism/photoprism:latest
 
