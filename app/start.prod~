@@ -1,0 +1,31 @@
+#!/bin/bash
+####################################
+#####
+###
+##
+#
+#
+# Startup Script for the Application
+####################################
+set -e
+. _lib.sh
+RootCheck
+echo "Starting [TheNovaDiary]"
+
+# Mount the SSHFS ZFS volume
+#sshfs novix@nivenly.com:Pictures /home/nova/AlicePictures
+
+docker run -d \
+  --name photoprism \
+  --security-opt seccomp=unconfined \
+  --security-opt apparmor=unconfined \
+  -p 0.0.0.0:8081:2342 \
+  -e PHOTOPRISM_UPLOAD_NSFW="true" \
+  -e PHOTOPRISM_DATABASE_DRIVER="mysql" \
+  -e PHOTOPRISM_DATABASE_SERVER="localhost"\
+  -e PHOTOPRISM_DATABASE_NAME="novaphotos"\
+  -e PHOTOPRISM_DATABASE_USER="photoprism"\
+  -e PHOTOPRISM_DATABASE_PASSWORD="charlie"\
+  -v /home/novix/Pictures:/photoprism/originals \
+  photoprism/photoprism:latest
+
