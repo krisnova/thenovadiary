@@ -51,6 +51,12 @@ func main() {
 				Usage:       "A unique name for this particular set of actions.",
 				Destination: &diaryConfig.Name,
 			},
+			&cli.StringFlag{
+				Name:        "library",
+				Value:       "library",
+				Usage:       "A unique name for this particular set of actions.",
+				Destination: &diaryConfig.Name,
+			},
 			&cli.IntFlag{
 				Name:        "verbose",
 				Value:       4,
