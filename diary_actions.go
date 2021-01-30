@@ -24,14 +24,18 @@ func ActionsString() string {
 
 type Action func(diary *Diary) error
 
+// DailyPhotoTweet is used to pull a photo from
+// the CDN photo storage and send a tweet with the
+// content and title of the Photo
 func DailyPhotoTweet(diary *Diary) error {
 	logger.Debug("Running DailyPhotoTweet")
-
-	// Connecting to Google Photos
-	// Looking on disk for a local filestore
-
-	//
-	// TODO Nova start twitter implementation here!
-	//
-	return nil
+	photo, err := GetPhoto(diary.config)
+	if err != nil {
+		return fmt.Errorf("Unable to reach CDN for photo: %v", err)
+	}
+	tweet := &DailyTweet{
+		Body:  photo.Title,
+		Photo: photo,
+	}
+	return SendTweet(diary.config, tweet)
 }

@@ -5,16 +5,14 @@ import (
 )
 
 type DiaryConfig struct {
-	Name               string // Unique identifier for logs
-	TwitterUser        string
-	TwitterPass        string
-	GoogleClientID     string
-	GoogleClientSecret string
-	//GoogleUser         string
-	//GooglePass         string
-	ActionString string
-	Actions      []Action
-	validated    bool
+	Name           string // Unique identifier for logs
+	TwitterUser    string
+	TwitterPass    string
+	PhotoprismPass string
+	PhotoprismUser string
+	ActionString   string
+	Actions        []Action
+	validated      bool
 }
 
 type Diary struct {

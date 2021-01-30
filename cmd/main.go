@@ -16,16 +16,16 @@ func main() {
 		Name: "DiaryApplication",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "gclientid",
-				Value:       "",
-				Usage:       "Used to pass a Google client ID at runtime.",
-				Destination: &diaryConfig.GoogleClientID,
+				Name:        "puser",
+				Value:       "admin",
+				Usage:       "Used to pass a Photoprism sername at runtime.",
+				Destination: &diaryConfig.PhotoprismUser,
 			},
 			&cli.StringFlag{
-				Name:        "gclientsecret",
+				Name:        "ppass",
 				Value:       "",
-				Usage:       "Used to pass a Google client secret at runtime.",
-				Destination: &diaryConfig.GoogleClientSecret,
+				Usage:       "Used to pass a Photoprism password secret at runtime.",
+				Destination: &diaryConfig.PhotoprismPass,
 			},
 			&cli.StringFlag{
 				Name:        "twuser",

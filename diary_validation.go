@@ -22,8 +22,8 @@ var (
 		v_emptyTwitterPass,
 		v_emptyTwitterUser,
 		v_actionStringToAction,
-		v_emptyGoogleClientID,
-		v_emptyGoogleClientSecret,
+		v_emptyPhotoprismUser,
+		v_emptyPhotoprismPass,
 	}
 )
 
@@ -86,28 +86,28 @@ func v_emptyTwitterUser(cfg *DiaryConfig) string {
 	return ""
 }
 
-func v_emptyGoogleClientID(cfg *DiaryConfig) string {
-	if cfg.GoogleClientID == "" {
-		cfg.GoogleClientID = os.Getenv("DIARY_GOOGLECLIENTID")
+func v_emptyPhotoprismUser(cfg *DiaryConfig) string {
+	if cfg.PhotoprismUser == "" {
+		cfg.PhotoprismUser = os.Getenv("DIARY_PHOTOPRISMUSER")
 	}
-	if cfg.GoogleClientID == "" {
-		return ferr("Empty GoogleClientID")
+	if cfg.PhotoprismUser == "" {
+		return ferr("Empty PhotoprismUser")
 	}
-	if len(cfg.GoogleClientID) < 3 {
-		return ferr("GoogleClientID < 3 chars")
+	if len(cfg.PhotoprismUser) < 3 {
+		return ferr("PhotoprismUser < 3 chars")
 	}
 	return ""
 }
 
-func v_emptyGoogleClientSecret(cfg *DiaryConfig) string {
-	if cfg.GoogleClientSecret == "" {
-		cfg.GoogleClientSecret = os.Getenv("DIARY_GOOGLECLIENTSECRET")
+func v_emptyPhotoprismPass(cfg *DiaryConfig) string {
+	if cfg.PhotoprismPass == "" {
+		cfg.PhotoprismPass = os.Getenv("DIARY_PHOTOPRISMPASS")
 	}
-	if cfg.GoogleClientSecret == "" {
-		return ferr("Empty GoogleClientSecret")
+	if cfg.PhotoprismPass == "" {
+		return ferr("Empty PhotoprismPass")
 	}
-	if len(cfg.GoogleClientSecret) < 3 {
-		return ferr("GoogleClientSecret < 3 chars")
+	if len(cfg.PhotoprismPass) < 3 {
+		return ferr("PhotoprismPass < 3 chars")
 	}
 	return ""
 }
