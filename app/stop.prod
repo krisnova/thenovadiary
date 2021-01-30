@@ -11,6 +11,8 @@ set -e
 . _lib.sh
 RootCheck
 docker stop photoprism
+
+# TODO Nova make this a switch
 docker rm photoprism
 
 

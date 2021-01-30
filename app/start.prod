@@ -19,7 +19,7 @@ docker run -d \
   --name photoprism \
   --security-opt seccomp=unconfined \
   --security-opt apparmor=unconfined \
-  -p 0.0.0.0:8081:2342 \
+  -p "0.0.0.0:8081:2342" \
   -e PHOTOPRISM_UPLOAD_NSFW="true" \
   -e PHOTOPRISM_DATABASE_DRIVER="mysql" \
   -e PHOTOPRISM_DATABASE_SERVER="10.0.0.188"\
