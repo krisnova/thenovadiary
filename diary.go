@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kubicorn/kubicorn/pkg/logger"
+	"github.com/kris-nova/logger"
 )
 
 type DiaryConfig struct {
@@ -25,35 +25,34 @@ type Diary struct {
 
 func New(cfg *DiaryConfig) *Diary {
 	return &Diary{
+		cache:  NewCache(cfg.Name),
 		config: cfg,
 	}
 }
 
 func (d *Diary) Service() error {
 	logger.Always("Starting service...")
-	cache := NewCache("Nova")
 	run := true
-	delta, err := cache.Recover()
+	delta, err := d.cache.Recover()
 	logger.Info("Delta found: %d", delta)
 	if err != nil {
-		logger.Info("Unable to recover cache %s, starting with empty cache: %v", cache.path.Name(), err)
+		logger.Info("Unable to recover cache %s, starting with empty cache: %v", d.cache.path.Name(), err)
 	} else {
-		logger.Info("Successful cache recovery from %s", cache.path.Name())
+		logger.Info("Successful cache recovery from %s", d.cache.path.Name())
 	}
 	for run {
 		d.lock.Lock()
 		// ----------------------------------
-		// 1)
 		{
-			logger.Debug("Sleeping...")
+			logger.Info("Running...")
+			// TODO @kris-nova please remove this
 			time.Sleep(2 * time.Second)
+
 		}
-		// 2)
-		// 3)
 		// ----------------------------------
-		cache.Persist()
+		d.cache.Persist()
 		d.lock.Unlock()
 	}
-
 	return nil
+
 }

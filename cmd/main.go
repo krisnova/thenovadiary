@@ -47,13 +47,7 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:        "name",
-				Value:       "daily",
-				Usage:       "A unique name for this particular set of actions.",
-				Destination: &diaryConfig.Name,
-			},
-			&cli.StringFlag{
-				Name:        "library",
-				Value:       "library",
+				Value:       "Nova",
 				Usage:       "A unique name for this particular set of actions.",
 				Destination: &diaryConfig.Name,
 			},

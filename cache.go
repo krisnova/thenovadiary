@@ -58,12 +58,16 @@ var cachedPath *os.File
 
 // GetCachePath is a deterministic function
 // to return an *os.File based on the system
-// running
+// running.
+//
+// By design this will also ensure the path is
+// writeable and created by this process's file
+// descriptor access.
 func GetCachePath(name string) (*os.File, error) {
 	if cachedPath != nil {
 		return cachedPath, nil
 	}
-	path := func() string {
+	getPath := func() string {
 		// GOOS/GOARCH
 		// https://github.com/golang/go/blob/master/src/go/build/syslist.go
 		// const goosList = "aix android darwin dragonfly freebsd hurd illumos ios js linux nacl netbsd openbsd plan9 solaris windows zos "
@@ -88,7 +92,8 @@ func GetCachePath(name string) (*os.File, error) {
 		}
 		// Default case (No Path Found!)
 		return ""
-	}()
+	}
+	path := getPath()
 	if path == "" {
 		return nil, fmt.Errorf("unable to find path")
 	}
@@ -100,6 +105,20 @@ func GetCachePath(name string) (*os.File, error) {
 	if err != nil {
 		logger.Debug("unable to mkdir -p cache directory: %v", err)
 	}
+
+	_, err = os.Stat(path)
+	// touch
+	if os.IsNotExist(err) {
+		// Database does not exist
+		createdFile, err := os.Create(path)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create new path %s: %v", path, err)
+		}
+		createdFile.Close()
+	} else if err != nil {
+		return nil, fmt.Errorf("unable to stat() %s: %v", path, err)
+	}
+	// Regardless of touch, open the file (sanity check)
 	f, err := os.Open(path)
 	defer f.Close()
 	if err != nil {
@@ -110,13 +129,13 @@ func GetCachePath(name string) (*os.File, error) {
 }
 
 func (c *Cache) Clean() error {
-	logger.Info(c.Now())
+	//logger.Info(c.Now())
 	c.globalMutex.Lock()
 	return os.Remove(c.path.Name())
 }
 
 func (c *Cache) Recover() (int, error) {
-	logger.Info(c.Now())
+	//logger.Info(c.Now())
 	c.globalMutex.Lock()
 	defer c.globalMutex.Unlock()
 
@@ -140,7 +159,7 @@ func (c *Cache) Recover() (int, error) {
 }
 
 func (c *Cache) Persist() error {
-	logger.Info(c.Now())
+	//logger.Info(c.Now())
 	jBytes, err := json.Marshal(&c)
 	if err != nil {
 		return fmt.Errorf("unable to persist (JSON) to disk: %v", err)
