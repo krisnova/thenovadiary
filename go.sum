@@ -7,11 +7,12 @@ github.com/kris-nova/logger v0.0.0-20181127235838-fd0d87064b06 h1:vN4d3jSss3ExzU
 github.com/kris-nova/logger v0.0.0-20181127235838-fd0d87064b06/go.mod h1:++9BgZujZd4v0ZTZCb5iPsaomXdZWyxotIAh1IiDm44=
 github.com/kris-nova/lolgopher v0.0.0-20210112022122-73f0047e8b65 h1:g+tnN/LHRq6LaUfeREPluv9g6jOtN3P1hQwTHofQTSw=
 github.com/kris-nova/lolgopher v0.0.0-20210112022122-73f0047e8b65/go.mod h1:V0HF/ZBlN86HqewcDC/cVxMmYDiRukWjSrgKLUAn9Js=
+github.com/kubicorn/kubicorn v0.0.0-20191114212505-a2c64ce430b9 h1:HgzA4yC4kPQfNIya55o4yA1WiKCXXA5wXvwoBKgIwXI=
+github.com/kubicorn/kubicorn v0.0.0-20191114212505-a2c64ce430b9/go.mod h1:Z/PU7XQicaZV6QFTAvm8EaWyfNbAb4a76kmR4Am4KA8=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
-github.com/photoprism/photoprism v0.0.0-20210130174952-535d295b3dc9 h1:KjTf0Wef/pfQUxiACB1v3+IWP5dOVkPcSrGzl4PqKzs=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

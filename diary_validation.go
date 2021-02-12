@@ -5,8 +5,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-
-	"github.com/kris-nova/logger"
 )
 
 type validationCheck func(cfg *DiaryConfig) string
@@ -21,9 +19,10 @@ var (
 	validationChecks = []validationCheck{
 		v_emptyTwitterPass,
 		v_emptyTwitterUser,
-		v_actionStringToAction,
+		//v_actionStringToAction,
 		v_emptyPhotoprismUser,
 		v_emptyPhotoprismPass,
+		v_emptyPhotoprismConn,
 	}
 )
 
@@ -43,22 +42,22 @@ func ValidateConfig(cfg *DiaryConfig) error {
 	return nil
 }
 
-func v_actionStringToAction(cfg *DiaryConfig) string {
-	spl := strings.Split(cfg.ActionString, ",")
-	if len(spl) <= 0 {
-		return ferr(fmt.Sprintf("Invalid ActionString %s", cfg.ActionString))
-	}
-	for _, a := range spl {
-		pKey := strings.Replace(a, " ", "", -1)
-		if f, ok := ActionMap[pKey]; ok {
-			logger.Always("Mapping action [%s]", pKey)
-			cfg.Actions = append(cfg.Actions, f)
-		} else {
-			return ferr(fmt.Sprintf("Invalid action: %s", pKey))
-		}
-	}
-	return ""
-}
+//func v_actionStringToAction(cfg *DiaryConfig) string {
+//	spl := strings.Split(cfg.ActionString, ",")
+//	if len(spl) <= 0 {
+//		return ferr(fmt.Sprintf("Invalid ActionString %s", cfg.ActionString))
+//	}
+//	for _, a := range spl {
+//		pKey := strings.Replace(a, " ", "", -1)
+//		if f, ok := ActionMap[pKey]; ok {
+//			logger.Always("Mapping action [%s]", pKey)
+//			cfg.Actions = append(cfg.Actions, f)
+//		} else {
+//			return ferr(fmt.Sprintf("Invalid action: %s", pKey))
+//		}
+//	}
+//	return ""
+//}
 
 func v_emptyTwitterPass(cfg *DiaryConfig) string {
 	if cfg.TwitterPass == "" {
@@ -108,6 +107,19 @@ func v_emptyPhotoprismPass(cfg *DiaryConfig) string {
 	}
 	if len(cfg.PhotoprismPass) < 3 {
 		return ferr("PhotoprismPass < 3 chars")
+	}
+	return ""
+}
+
+func v_emptyPhotoprismConn(cfg *DiaryConfig) string {
+	if cfg.PhotoprismConn == "" {
+		cfg.PhotoprismConn = os.Getenv("DIARY_PHOTOPRISMCONN")
+	}
+	if cfg.PhotoprismConn == "" {
+		return ferr("Empty PhotoprismConn")
+	}
+	if len(cfg.PhotoprismConn) < 3 {
+		return ferr("PhotoprismConn < 3 chars")
 	}
 	return ""
 }

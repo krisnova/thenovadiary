@@ -1,8 +1,6 @@
 package thenovadiary
 
-import (
-	"fmt"
-)
+import "github.com/kubicorn/kubicorn/pkg/logger"
 
 type DiaryConfig struct {
 	Name           string // Unique identifier for logs
@@ -10,8 +8,7 @@ type DiaryConfig struct {
 	TwitterPass    string
 	PhotoprismPass string
 	PhotoprismUser string
-	ActionString   string
-	Actions        []Action
+	PhotoprismConn string
 	validated      bool
 }
 
@@ -25,16 +22,8 @@ func New(cfg *DiaryConfig) *Diary {
 	}
 }
 
-func (d *Diary) ExecuteActions() error {
-	if d.config.validated != true {
-		return fmt.Errorf("Please call ValidateConfig() before attempting to run actions")
-	}
-	for _, action := range d.config.Actions {
-		err := action(d)
-		if err != nil {
-			// Break
-			return fmt.Errorf("Critical error, halting action processing: %v", err)
-		}
-	}
+func (d *Diary) Service() error {
+	logger.Always("Starting service...")
+
 	return nil
 }

@@ -28,6 +28,12 @@ func main() {
 				Destination: &diaryConfig.PhotoprismPass,
 			},
 			&cli.StringFlag{
+				Name:        "pconn",
+				Value:       "",
+				Usage:       "Used to pass a Photoprism connection string at runtime.",
+				Destination: &diaryConfig.PhotoprismConn,
+			},
+			&cli.StringFlag{
 				Name:        "twuser",
 				Value:       "",
 				Usage:       "Used to pass a Twitter username at runtime.",
@@ -38,12 +44,6 @@ func main() {
 				Value:       "",
 				Usage:       "Used to pass a Twitter username at runtime.",
 				Destination: &diaryConfig.TwitterPass,
-			},
-			&cli.StringFlag{
-				Name:        "actions",
-				Value:       "daily",
-				Usage:       fmt.Sprintf("Comma dilimited set of action strings: %s", thenovadiary.ActionsString()),
-				Destination: &diaryConfig.ActionString,
 			},
 			&cli.StringFlag{
 				Name:        "name",
@@ -85,6 +85,8 @@ func RunDiary(cfg *thenovadiary.DiaryConfig) error {
 		return fmt.Errorf("Unable to init config: %v", err)
 	}
 	logger.Always("Running Diary Program [%s]", cfg.Name)
-	diary := thenovadiary.New(cfg)
-	return diary.ExecuteActions()
+
+	// Start program here!
+	app := thenovadiary.New(cfg)
+	return app.Service()
 }
