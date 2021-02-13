@@ -53,6 +53,14 @@ func (d *Diary) Service() error {
 			if err != nil {
 				logger.Critical("Service Loop Error: SendDailyTweet: %v", err)
 			}
+
+			// Listen for /nova on twitter
+
+			// Check for container updates
+
+			// compile ZFS kernel modules
+
+			// compile Falco kernel modules
 		}
 		// ----------------------------------
 		//d.lock.Unlock()
