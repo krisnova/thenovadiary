@@ -43,28 +43,29 @@ func (d *Diary) Service() error {
 	} else {
 		logger.Info("Successful cache recovery from %s", d.cache.path.Name())
 	}
+	logger.Debug("Service loop...")
 	for run {
 		//d.lock.Lock()
 		// ----------------------------------
-		{
-			logger.Debug("...")
-			// TODO @kris-nova please remove this
-			time.Sleep(2 * time.Second)
 
-			// Daily Tweet Here
-			err := d.SendDailyTweet()
-			if err != nil {
-				logger.Critical("Service Loop Error: SendDailyTweet: %v", err)
-			}
+		//logger.Debug("...")
+		// TODO @kris-nova please remove this
+		time.Sleep(2 * time.Second)
 
-			// Listen for /nova on twitter
-
-			// Check for container updates
-
-			// compile ZFS kernel modules
-
-			// compile Falco kernel modules
+		// Daily Tweet Here
+		err := d.SendDailyTweet()
+		if err != nil {
+			logger.Critical("Service Loop Error: SendDailyTweet: %v", err)
 		}
+
+		// Listen for /nova on twitter
+
+		// Check for container updates
+
+		// compile ZFS kernel modules
+
+		// compile Falco kernel modules
+
 		// ----------------------------------
 		//d.lock.Unlock()
 		d.cache.Persist()

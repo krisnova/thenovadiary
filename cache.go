@@ -14,6 +14,9 @@ import (
 	"github.com/kris-nova/logger"
 )
 
+// TODO We need to support native times in our records
+// TODO  We need this to work well with unit tests for our crons
+
 const (
 	DatabaseMode = 0755
 	DatabaseName = "cache.db"

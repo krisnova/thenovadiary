@@ -1,25 +1,53 @@
 package thenovadiary
 
 import (
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/kris-nova/logger"
 	"github.com/kris-nova/photoprism-client-go"
 	"github.com/kris-nova/photoprism-client-go/api/v1"
 )
 
-// List all photos
-// Check each photo for last tweet date
-// If last tweet date < today | tweet | flip
-// If !flip | tweet[0] | cache ++
-// Save cache
+type Notes struct {
+	LastTweet   *time.Time
+	NoteStrings []string
+	KeyValue    map[string]string
+}
+
+// AddNotes will add a *Notes{} pointer as JSON to:
+//     photo.PhotoDescription
+func AddNotes(notes *Notes, photo api.Photo) (api.Photo, error) {
+	jBytes, err := json.Marshal(&notes)
+	if err != nil {
+		return photo, fmt.Errorf("unable to add notes: %v", err)
+	}
+	photo.PhotoDescription = string(jBytes)
+	return photo, nil
+}
+
+// GetNotes will return a *Notes{} pointer from:
+//     photo.PhotoDescription
+func GetNotes(photo api.Photo) *Notes {
+	notes := &Notes{}
+	if photo.PhotoDescription == "" {
+		return notes
+	}
+	noteStr := photo.PhotoDescription
+	err := json.Unmarshal([]byte(noteStr), &notes)
+	if err != nil {
+		logger.Warning("INVALID JSON in Notes: %v", err)
+		return notes
+	}
+	return notes
+}
 
 // FindNextPhoto will list all photos and
 // linear search for a photo that was last
 // updated with the greatest delta in days
 // ago based on the timestamp found in
 //
-//      photo.PhotoDescription (timestamp)
 //
 // The function will return unprocessed
 // photos first by design.
@@ -33,49 +61,26 @@ func FindNextPhoto(client *photoprism.Client) (*api.Photo, error) {
 		return nil, fmt.Errorf("unable to list photos: %v", err)
 	}
 
-	// ------ [ System to Find Photo ] -------
 	today := TimeToday()
 	var photoGreatestDelta *api.Photo
 	gDelta := 0 // This will let us know if we have found a photo
 	for _, photo := range photos {
-		// ----------------------------------
-		// We need to handle 3 cases
-		//   - No  *Details{} (No  timestamp)
-		//   - Yes *Details{} (No  timestamp)
-		//   - Yes *Details{} (Yes timestamp)
-		if photo.Details == nil {
-			photo.Details = &api.Details{}
-			// This photo has never been processed
-			//   - No  *Details{} (No  timestamp)
+		notes := GetNotes(photo)
+		if notes.LastTweet == nil {
 			return &photo, nil
 		} else {
-			lastTweetStr := photo.PhotoDescription
-			if lastTweetStr == "" {
-				// This photo has never been processed
-				//   - Yes  *Details{} (No  timestamp)
-				return &photo, nil
-			}
-			//   - Yes *Details{} (Yes timestamp)
-			timeFromDB, err := TimeStringToTime(lastTweetStr)
-			if err != nil {
-				return nil, fmt.Errorf("unable to parse time from DB have {%s}", lastTweetStr)
-			}
+			timeFromDB := notes.LastTweet
 			pDelta := TimeDeltaDays(today, *timeFromDB)
 			if pDelta > gDelta {
-				// This system will grab the greatest delta
-				// or oldest photo first
 				gDelta = pDelta
 				photoGreatestDelta = &photo
 			}
 		}
 	}
-
 	if gDelta > 0 {
-		// We have found the oldest photo
 		return photoGreatestDelta, nil
 	}
-	// Interesting case
-	// Here we have photos with no timestamp < today
+	// Error
 	return nil, fmt.Errorf("unable to find photo with old timestamp")
 }
 
