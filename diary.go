@@ -51,7 +51,7 @@ func (d *Diary) Service() error {
 			// Daily Tweet Here
 			err := d.SendDailyTweet()
 			if err != nil {
-				logger.Critical("error sending tweet: %v", err)
+				logger.Critical("Service Loop Error: SendDailyTweet: %v", err)
 			}
 		}
 		// ----------------------------------

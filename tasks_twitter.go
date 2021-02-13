@@ -108,16 +108,20 @@ func (d *Diary) SendDailyTweet() error {
 	for _, photo := range photosInAlbum {
 		// Check if we have posted this
 		pCount := 0
-		for _, label := range photo.Labels {
-			if label.Label.LabelName == "pcount" {
-				p, err := strconv.Atoi(label.Label.LabelDescription)
-				if err != nil {
-					//No error here
-					continue
-				}
-				pCount = p
-			}
+
+		// --- Sync pCount ---
+		if photo.Details == nil {
+			photo.Details = &api.Details{}
 		}
+		noteSrc := photo.Details.Notes
+		n, err := strconv.Atoi(noteSrc)
+		if err != nil {
+			logger.Warning("error reading notes: %v", err)
+			n = 0
+		}
+		pCount = n
+		// --- Sync pCount ---
+
 		// Now pcount is updated
 		// count 1, pcount 0
 		// count 1, pcount 1
@@ -129,36 +133,12 @@ func (d *Diary) SendDailyTweet() error {
 				return fmt.Errorf("unable to tweet photo: %v", err)
 			}
 			logger.Always("Successful tweet of photo: %s", photo.PhotoTitle)
-			labelUpdate := false
-			for i, label := range photo.Labels {
-				if label.Label.LabelName == "pcount" {
-					//pCount++
-					label.Label.LabelDescription = fmt.Sprintf("%d", pCount+1)
-					photo.Labels[i] = label
-					uPhoto, err := client.V1().UpdatePhoto(photo)
-					if err != nil {
-						return fmt.Errorf("unable to update photo: %v", err)
-					}
-					logger.Info("Successfully updated photo: %s", uPhoto.PhotoTitle)
-					labelUpdate = true
-				}
+			photo.Details.Notes = fmt.Sprintf("%d", pCount+1)
+			uPhoto, err := client.V1().UpdatePhoto(photo)
+			if err != nil {
+				return fmt.Errorf("unable to update photo: %v", err)
 			}
-			if !labelUpdate {
-				// Create Label
-				newLabel := api.PhotoLabel{
-					Label: &api.Label{
-						LabelName:        "pcount",
-						LabelDescription: fmt.Sprintf("1"),
-					},
-				}
-				photo.Labels = append(photo.Labels, newLabel)
-				uPhoto, err := client.V1().UpdatePhoto(photo)
-				if err != nil {
-					return fmt.Errorf("unable to update photo: %v", err)
-				}
-				logger.Info("Successfully created photo pcount label: %s", uPhoto.PhotoTitle)
-				labelUpdate = true
-			}
+			logger.Info("Updated photo: %s", uPhoto.PhotoTitle)
 		}
 	}
 
@@ -169,13 +149,21 @@ func (d *Diary) SendDailyTweet() error {
 		if err != nil {
 			return fmt.Errorf("unable to tweet photo: %s", photo.PhotoTitle)
 		}
+
+		// --- Update The Cache Count ---
 		countRecord.Value = count + 1
 		d.cache.Set(PhotoCountKey, countRecord)
-	}
 
-	// Init Twitter Client
-	// Tweet Photo + Description
-	logger.Always("Sending Tweet")
+		// --- Update The pCount ---
+		logger.Always("Successful tweet of photo: %s", photo.PhotoTitle)
+		photo.Details.Notes = fmt.Sprintf("%d", count+1)
+		uPhoto, err := client.V1().UpdatePhoto(photo)
+		if err != nil {
+			return fmt.Errorf("unable to update photo: %v", err)
+		}
+		logger.Info("Updated photo: %s", uPhoto.PhotoTitle)
+
+	}
 
 	save := &Record{
 		Key:   DailyTweetCacheKey,
@@ -188,7 +176,6 @@ func (d *Diary) SendDailyTweet() error {
 }
 
 func tweet(photo api.Photo) error {
-
-	logger.Always("Win! Will Tweet: %s", photo.PhotoTitle)
+	logger.Always("Sending Tweet: %s", photo.PhotoTitle)
 	return nil
 }
