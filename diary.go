@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kris-nova/photoprism-client-go"
+
 	"github.com/kris-nova/logger"
 )
 
@@ -18,9 +20,10 @@ type DiaryConfig struct {
 }
 
 type Diary struct {
-	config *DiaryConfig
-	lock   sync.Mutex
-	cache  *Cache
+	photoprismClient *photoprism.Client
+	config           *DiaryConfig
+	lock             sync.Mutex
+	cache            *Cache
 }
 
 func New(cfg *DiaryConfig) *Diary {
