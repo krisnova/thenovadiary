@@ -41,17 +41,22 @@ func (d *Diary) Service() error {
 		logger.Info("Successful cache recovery from %s", d.cache.path.Name())
 	}
 	for run {
-		d.lock.Lock()
+		//d.lock.Lock()
 		// ----------------------------------
 		{
-			logger.Info("Running...")
+			logger.Debug("...")
 			// TODO @kris-nova please remove this
 			time.Sleep(2 * time.Second)
 
+			// Daily Tweet Here
+			err := d.SendDailyTweet()
+			if err != nil {
+				logger.Critical("error sending tweet: %v", err)
+			}
 		}
 		// ----------------------------------
+		//d.lock.Unlock()
 		d.cache.Persist()
-		d.lock.Unlock()
 	}
 	return nil
 

@@ -192,6 +192,14 @@ func (c *Cache) Set(key string, r *Record) {
 	c.Records[key] = r
 }
 
+func (c *Cache) Remove(key string) {
+	c.globalMutex.Lock()
+	defer c.globalMutex.Unlock()
+	if _, ok := c.Records[key]; ok {
+		delete(c.Records, key)
+	}
+}
+
 func (c *Cache) Now() string {
 	c.globalMutex.Lock()
 	defer c.globalMutex.Unlock()
