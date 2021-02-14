@@ -14,6 +14,7 @@ type Notes struct {
 	LastTweet   *time.Time
 	NoteStrings []string
 	KeyValue    map[string]string
+	Description string
 }
 
 // AddNotes will add a *Notes{} pointer as JSON to:

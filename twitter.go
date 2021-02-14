@@ -43,7 +43,8 @@ func SendPhotoTweet(twitter *anaconda.TwitterApi, photo api.Photo, pBytes []byte
 	// ------ [ Send Tweet ] ------
 	v := url.Values{}
 	v.Set("media_ids", media.MediaIDString)
-	status := ""
+	notes := GetNotes(photo)
+
 	tweet, err := twitter.PostTweet(status, v)
 	if err != nil {
 		return DefaultTwitterURL, fmt.Errorf("unable to tweet: %v", err)
