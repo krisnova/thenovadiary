@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/kris-nova/photoprism-client-go/api/v1"
@@ -24,6 +25,9 @@ const (
 	// we should update here
 	DefaultTwitterHandle = "thenovadiary"
 	DefaultTwitterURL    = "https://twitter.com/thenovadiary"
+
+	// The twitter API now accepts tweets with 280 characters
+	TwitterLengthLimit = 280
 )
 
 // SendPhotoTweet will return the URL of the sent tweet and/or an
@@ -43,9 +47,7 @@ func SendPhotoTweet(twitter *anaconda.TwitterApi, photo api.Photo, pBytes []byte
 	// ------ [ Send Tweet ] ------
 	v := url.Values{}
 	v.Set("media_ids", media.MediaIDString)
-	notes := GetNotes(photo)
-
-	tweet, err := twitter.PostTweet(status, v)
+	tweet, err := twitter.PostTweet(GetStatus(photo), v)
 	if err != nil {
 		return DefaultTwitterURL, fmt.Errorf("unable to tweet: %v", err)
 	}
@@ -66,4 +68,41 @@ func b64d(message []byte) (b []byte, err error) {
 		return
 	}
 	return b[:l], nil
+}
+
+func GetStatus(photo api.Photo) string {
+	var metaFields []string
+	if photo.PhotoFocalLength != 0 {
+		metaFields = append(metaFields, fmt.Sprintf("%d mm", photo.PhotoFocalLength))
+	}
+	if photo.PhotoIso != 0 {
+		metaFields = append(metaFields, fmt.Sprintf("%d ISO", photo.PhotoIso))
+	}
+	if photo.PhotoExposure != "" {
+		metaFields = append(metaFields, fmt.Sprintf("%s Exposure", photo.PhotoExposure))
+	}
+	if photo.PhotoFNumber != 0 {
+		metaFields = append(metaFields, fmt.Sprintf("F %d", photo.PhotoFNumber))
+	}
+	var status string
+	meta := strings.Join(metaFields, " ")
+	if meta == "" {
+		status = photo.PhotoTitle
+	} else {
+		status = fmt.Sprintf("%s (%s)", photo.PhotoTitle, meta)
+	}
+	if len(status) > TwitterLengthLimit {
+		if len(photo.PhotoTitle) < TwitterLengthLimit {
+			return photo.PhotoTitle
+		}
+
+		// Limit string by length
+		truncated := ""
+		for i := 0; i < TwitterLengthLimit-3; i++ {
+			charRune := status[i]
+			truncated = fmt.Sprintf("%s%c", truncated, charRune)
+		}
+		return fmt.Sprintf("%s...", truncated)
+	}
+	return status
 }
