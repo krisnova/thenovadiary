@@ -10,13 +10,15 @@ import (
 )
 
 type DiaryConfig struct {
-	Name           string // Unique identifier for logs
-	TwitterUser    string
-	TwitterPass    string
-	PhotoprismPass string
-	PhotoprismUser string
-	PhotoprismConn string
-	validated      bool
+	Name                     string // Unique identifier for logs
+	TwitterToken             string
+	TwitterTokenSecret       string
+	TwitterConsumerKey       string
+	TwitterConsumerKeySecret string
+	PhotoprismPass           string
+	PhotoprismUser           string
+	PhotoprismConn           string
+	validated                bool
 }
 
 type Diary struct {

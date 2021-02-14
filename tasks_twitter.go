@@ -61,9 +61,10 @@ func (d *Diary) SendDailyTweet() error {
 	logger.Debug("Downloaded photo %d kb", len(pBytes)/1024)
 
 	// ------- [ Auth Twitter Client ] ------
-	tURL := "https://twitter.com/thenovadiary"
+	tURL := DefaultTwitterURL
 	if !BypassTwitter {
-		tClient := anaconda.NewTwitterApiWithCredentials("", "", "", "")
+		cfg := d.config
+		tClient := anaconda.NewTwitterApiWithCredentials(cfg.TwitterToken, cfg.TwitterTokenSecret, cfg.TwitterConsumerKey, cfg.TwitterConsumerKeySecret)
 		tURL, err = SendPhotoTweet(tClient, photo, pBytes)
 		if err != nil {
 			return fmt.Errorf("unable to send tweet: %v", err)

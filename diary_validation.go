@@ -17,12 +17,13 @@ var (
 	// TODO Use reflection to pre-populate all
 	// functions that start with "v_"
 	validationChecks = []validationCheck{
-		v_emptyTwitterPass,
-		v_emptyTwitterUser,
-		//v_actionStringToAction,
 		v_emptyPhotoprismUser,
 		v_emptyPhotoprismPass,
 		v_emptyPhotoprismConn,
+		v_emptyTwitterConsumerKey,
+		v_emptyTwitterConsumerKeySecret,
+		v_emptyTwitterToken,
+		v_emptyTwitterTokenSecret,
 	}
 )
 
@@ -42,45 +43,54 @@ func ValidateConfig(cfg *DiaryConfig) error {
 	return nil
 }
 
-//func v_actionStringToAction(cfg *DiaryConfig) string {
-//	spl := strings.Split(cfg.ActionString, ",")
-//	if len(spl) <= 0 {
-//		return ferr(fmt.Sprintf("Invalid ActionString %s", cfg.ActionString))
-//	}
-//	for _, a := range spl {
-//		pKey := strings.Replace(a, " ", "", -1)
-//		if f, ok := ActionMap[pKey]; ok {
-//			logger.Always("Mapping action [%s]", pKey)
-//			cfg.Actions = append(cfg.Actions, f)
-//		} else {
-//			return ferr(fmt.Sprintf("Invalid action: %s", pKey))
-//		}
-//	}
-//	return ""
-//}
-
-func v_emptyTwitterPass(cfg *DiaryConfig) string {
-	if cfg.TwitterPass == "" {
-		cfg.TwitterPass = os.Getenv("DIARY_TWITTERPASS")
+func v_emptyTwitterToken(cfg *DiaryConfig) string {
+	if cfg.TwitterToken == "" {
+		cfg.TwitterToken = os.Getenv("DIARY_TWITTERTOKEN")
 	}
-	if cfg.TwitterPass == "" {
-		return ferr("Empty TwitterPass")
+	if cfg.TwitterToken == "" {
+		return ferr("Empty TwitterToken")
 	}
-	if len(cfg.TwitterPass) < 3 {
-		return ferr("TwitterPass < 3 chars")
+	if len(cfg.TwitterToken) < 3 {
+		return ferr("TwitterToken < 3 chars")
 	}
 	return ""
 }
 
-func v_emptyTwitterUser(cfg *DiaryConfig) string {
-	if cfg.TwitterUser == "" {
-		cfg.TwitterUser = os.Getenv("DIARY_TWITTERUSER")
+func v_emptyTwitterTokenSecret(cfg *DiaryConfig) string {
+	if cfg.TwitterTokenSecret == "" {
+		cfg.TwitterTokenSecret = os.Getenv("DIARY_TWITTERTOKENSECRET")
 	}
-	if cfg.TwitterUser == "" {
-		return ferr("Empty TwitterUser")
+	if cfg.TwitterTokenSecret == "" {
+		return ferr("Empty TwitterTokenSecret")
 	}
-	if len(cfg.TwitterPass) < 3 {
-		return ferr("TwitterUser < 3 chars")
+	if len(cfg.TwitterTokenSecret) < 3 {
+		return ferr("TwitterTokenSecret < 3 chars")
+	}
+	return ""
+}
+
+func v_emptyTwitterConsumerKey(cfg *DiaryConfig) string {
+	if cfg.TwitterConsumerKey == "" {
+		cfg.TwitterConsumerKey = os.Getenv("DIARY_TWITTERCONSUMERKEY")
+	}
+	if cfg.TwitterConsumerKey == "" {
+		return ferr("Empty TwitterConsumerKey")
+	}
+	if len(cfg.TwitterConsumerKey) < 3 {
+		return ferr("TwitterConsumerKey < 3 chars")
+	}
+	return ""
+}
+
+func v_emptyTwitterConsumerKeySecret(cfg *DiaryConfig) string {
+	if cfg.TwitterConsumerKeySecret == "" {
+		cfg.TwitterConsumerKeySecret = os.Getenv("DIARY_TWITTERCONSUMERKEYSECRET")
+	}
+	if cfg.TwitterConsumerKeySecret == "" {
+		return ferr("Empty TwitterConsumerKeySecret")
+	}
+	if len(cfg.TwitterConsumerKeySecret) < 3 {
+		return ferr("TwitterConsumerKeySecret < 3 chars")
 	}
 	return ""
 }
