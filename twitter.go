@@ -66,19 +66,19 @@ func b64d(message []byte) (b []byte, err error) {
 func GetStatus(photo api.Photo) string {
 	var metaFields []string
 	if photo.PhotoFocalLength != 0 {
-		metaFields = append(metaFields, fmt.Sprintf("%d mm", photo.PhotoFocalLength))
+		metaFields = append(metaFields, fmt.Sprintf("FocalLength(%dmm)", photo.PhotoFocalLength))
 	}
 	if photo.PhotoIso != 0 {
-		metaFields = append(metaFields, fmt.Sprintf("%d ISO", photo.PhotoIso))
+		metaFields = append(metaFields, fmt.Sprintf("ISO(%d)", photo.PhotoIso))
 	}
 	if photo.PhotoExposure != "" {
-		metaFields = append(metaFields, fmt.Sprintf("%s Exposure", photo.PhotoExposure))
+		metaFields = append(metaFields, fmt.Sprintf("Exposure(%s)", photo.PhotoExposure))
 	}
 	if photo.PhotoFNumber != 0 {
-		metaFields = append(metaFields, fmt.Sprintf("F %f", photo.PhotoFNumber))
+		metaFields = append(metaFields, fmt.Sprintf("F(%v)", int(photo.PhotoFNumber)))
 	}
 	var status string
-	meta := strings.Join(metaFields, " ")
+	meta := strings.Join(metaFields, " | ")
 	if meta == "" {
 		status = photo.PhotoTitle
 	} else {
