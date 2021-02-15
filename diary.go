@@ -18,6 +18,7 @@ type DiaryConfig struct {
 	PhotoprismPass           string
 	PhotoprismUser           string
 	PhotoprismConn           string
+	PhotoprismAlbum          string
 	validated                bool
 }
 
@@ -38,8 +39,7 @@ func New(cfg *DiaryConfig) *Diary {
 func (d *Diary) Service() error {
 	logger.Always("Starting service...")
 	run := true
-	delta, err := d.cache.Recover()
-	logger.Info("Delta found: %d", delta)
+	_, err := d.cache.Recover()
 	if err != nil {
 		logger.Info("Unable to recover cache %s, starting with empty cache: %v", d.cache.path.Name(), err)
 	} else {

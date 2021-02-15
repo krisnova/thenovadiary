@@ -34,6 +34,12 @@ func main() {
 				Destination: &diaryConfig.PhotoprismConn,
 			},
 			&cli.StringFlag{
+				Name:        "palbum",
+				Value:       "",
+				Usage:       "Used to pass a Photoprism album id at runtime.",
+				Destination: &diaryConfig.PhotoprismAlbum,
+			},
+			&cli.StringFlag{
 				Name:        "twtokensecret",
 				Value:       "",
 				Usage:       "Used to pass a Twitter token secret at runtime.",

@@ -3,6 +3,7 @@ package thenovadiary
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/kris-nova/logger"
@@ -10,38 +11,33 @@ import (
 	"github.com/kris-nova/photoprism-client-go/api/v1"
 )
 
-type Notes struct {
+type CustomData struct {
 	LastTweet   *time.Time
 	NoteStrings []string
 	KeyValue    map[string]string
 	Description string
 }
 
-// AddNotes will add a *Notes{} pointer as JSON to:
-//     photo.PhotoDescription
-func AddNotes(notes *Notes, photo api.Photo) (api.Photo, error) {
-	jBytes, err := json.Marshal(&notes)
+func SetCustomData(d *CustomData, photo api.Photo) (api.Photo, error) {
+	jBytes, err := json.Marshal(&d)
 	if err != nil {
-		return photo, fmt.Errorf("unable to add notes: %v", err)
+		return photo, fmt.Errorf("unable to set custom photo data: %v", err)
 	}
 	photo.PhotoDescription = string(jBytes)
 	return photo, nil
 }
 
-// GetNotes will return a *Notes{} pointer from:
-//     photo.PhotoDescription
-func GetNotes(photo api.Photo) *Notes {
-	notes := &Notes{}
+func GetCustomData(photo api.Photo) *CustomData {
+	d := &CustomData{}
 	if photo.PhotoDescription == "" {
-		return notes
+		return d
 	}
 	noteStr := photo.PhotoDescription
-	err := json.Unmarshal([]byte(noteStr), &notes)
+	err := json.Unmarshal([]byte(noteStr), &d)
 	if err != nil {
 		logger.Warning("INVALID JSON in Notes: %v", err)
-		return notes
 	}
-	return notes
+	return d
 }
 
 // FindNextPhoto will list all photos and
@@ -52,37 +48,103 @@ func GetNotes(photo api.Photo) *Notes {
 //
 // The function will return unprocessed
 // photos first by design.
-func FindNextPhoto(client *photoprism.Client) (*api.Photo, error) {
+func FindNextPhotoInAlbum(client *photoprism.Client, albumID string) (*api.Photo, error) {
 	// TODO Nóva add pagination
 	photos, err := client.V1().GetPhotos(&api.PhotoOptions{
-		AlbumUID: WellKnownAlbumID,
+		AlbumUID: albumID,
 		Count:    500, // TODO This is an  enormous number holy shit
 	})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list photos: %v", err)
 	}
+	logger.Debug("Searching photo album: %s", albumID)
+	logger.Debug("Found %d photos to process", len(photos))
 
+	// --------------------------------------------------------------------------
+	//
+	// Photo processing rules
+	//   - Rules are processed linearly (slow) using a linear search for each
+	//   - The first rule to match will win the search
+	//
+	//
+	// ------ [ Shuffle Photos ] ------
+	photos = shufflePhotos(photos)
+	//
+	// ------ [ Photo Pointer ] ------
+	var photoToTweet *api.Photo
+	//
+	// ------ [ Favorites ] ------
+	if photoToTweet == nil {
+		photoToTweet = findFirstFavoritePhoto(photos)
+	}
+	// ------ [ New ] ------
+	if photoToTweet == nil {
+		photoToTweet = findFirstNewPhoto(photos)
+	}
+	// ------ [ Oldest ] ------
+	if photoToTweet == nil {
+		photoToTweet = findOldestPhoto(photos)
+	}
+	if photoToTweet == nil {
+		return nil, fmt.Errorf(
+			"unable to find photo in album [$s] check for correct albumid and photos exist",
+			albumID)
+	}
+	return photoToTweet, nil
+	//
+	//
+	// --------------------------------------------------------------------------
+}
+
+// The old Fisher–Yates shuffle
+func shufflePhotos(photos []api.Photo) []api.Photo {
+	rand.Seed(time.Now().UnixNano())
+	for i, _ := range photos {
+		j := rand.Intn(i + 1)
+		photos[i], photos[j] = photos[j], photos[i]
+	}
+	return photos
+}
+
+func findOldestPhoto(photos []api.Photo) *api.Photo {
 	today := TimeToday()
-	var photoGreatestDelta *api.Photo
-	gDelta := 0 // This will let us know if we have found a photo
+	var oldestPhoto *api.Photo
+	delta := 0
 	for _, photo := range photos {
-		notes := GetNotes(photo)
-		if notes.LastTweet == nil {
-			return &photo, nil
-		} else {
-			timeFromDB := notes.LastTweet
-			pDelta := TimeDeltaDays(today, *timeFromDB)
-			if pDelta > gDelta {
-				gDelta = pDelta
-				photoGreatestDelta = &photo
+		data := GetCustomData(photo)
+		if data.LastTweet != nil {
+			timeFromData := *data.LastTweet
+			pDelta := TimeDeltaDays(today, timeFromData)
+			if pDelta > delta {
+				oldestPhoto = &photo
 			}
 		}
 	}
-	if gDelta > 0 {
-		return photoGreatestDelta, nil
+	if delta > 0 {
+		logger.Debug("Found oldest photo %s with delta %d", oldestPhoto.PhotoTitle, delta)
 	}
-	// Error
-	return nil, fmt.Errorf("unable to find photo with old timestamp")
+	return oldestPhoto
+}
+
+func findFirstNewPhoto(photos []api.Photo) *api.Photo {
+	for _, photo := range photos {
+		data := GetCustomData(photo)
+		if data.LastTweet == nil {
+			logger.Debug("Found first new photo: %s", photo.PhotoTitle)
+			return &photo
+		}
+	}
+	return nil
+}
+
+func findFirstFavoritePhoto(photos []api.Photo) *api.Photo {
+	for _, photo := range photos {
+		if photo.PhotoFavorite {
+			logger.Debug("Found first favorite photo: %s", photo.PhotoTitle)
+			return &photo
+		}
+	}
+	return nil
 }
 
 // NewPhotoprismClient will always return a new client with a fresh token

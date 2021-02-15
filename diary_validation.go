@@ -95,6 +95,19 @@ func v_emptyTwitterConsumerKeySecret(cfg *DiaryConfig) string {
 	return ""
 }
 
+func v_emptyPhotoprismAlbum(cfg *DiaryConfig) string {
+	if cfg.PhotoprismAlbum == "" {
+		cfg.PhotoprismAlbum = os.Getenv("DIARY_PHOTOPRISMUSER")
+	}
+	if cfg.PhotoprismAlbum == "" {
+		return ferr("Empty PhotoprismAlbum")
+	}
+	if len(cfg.PhotoprismAlbum) < 3 {
+		return ferr("PhotoprismAlbum < 3 chars")
+	}
+	return ""
+}
+
 func v_emptyPhotoprismUser(cfg *DiaryConfig) string {
 	if cfg.PhotoprismUser == "" {
 		cfg.PhotoprismUser = os.Getenv("DIARY_PHOTOPRISMUSER")

@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	WellKnownAlbumID   = "aqofyebwd9187e3e"
 	DailyTweetCacheKey = "dailytweet"
 )
 
@@ -21,7 +20,6 @@ func (d *Diary) SendDailyTweet() error {
 	if !cachedRecord.Found {
 		cachedRecord.Value = TimeDeltaDaysFromNow(-100)
 	}
-	fmt.Println(cachedRecord.Value)
 	lastTweetTime, err := time.Parse(TimeLayoutTimeTime, fmt.Sprintf("%v", cachedRecord.Value))
 	if err != nil {
 		// Unable to pull time from record
@@ -46,11 +44,11 @@ func (d *Diary) SendDailyTweet() error {
 	if err != nil {
 		return fmt.Errorf("unable to build new photoprism client: %v", err)
 	}
-	pphoto, err := FindNextPhoto(pClient)
+	photoPtr, err := FindNextPhotoInAlbum(pClient, d.config.PhotoprismAlbum)
 	if err != nil {
 		return err
 	}
-	photo := *pphoto
+	photo := *photoPtr
 	logger.Debug("Processing photo: %s", photo.UUID)
 
 	// ------- [ Get Photo Content ] ------
@@ -73,13 +71,14 @@ func (d *Diary) SendDailyTweet() error {
 
 	// ------- [ Photo Found, Tweet Sent (lol), Update Cache ] ------
 	logger.Debug("Syncing photo: %s", photo.PhotoUID)
-	notes := GetNotes(photo)
-	notes.LastTweet = &today
-	photo, err = AddNotes(notes, photo)
+	data := GetCustomData(photo)
+	data.LastTweet = &today
+	photo, err = SetCustomData(data, photo)
 	if err != nil {
 		return err
 	}
-
+	// Always set favorite == false
+	photo.PhotoFavorite = false
 	_, err = pClient.V1().UpdatePhoto(photo)
 	if err != nil {
 		return fmt.Errorf("unable to update photoprism photo: %v", err)
