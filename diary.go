@@ -45,13 +45,14 @@ func (d *Diary) Service() error {
 	} else {
 		logger.Info("Successful cache recovery from %s", d.cache.path.Name())
 	}
+	DebugConfig()
 	logger.Debug("Service loop...")
 	for run {
 		//d.lock.Lock()
 		// ----------------------------------
 
 		//logger.Debug("...")
-		// TODO @kris-nova please remove this
+		//
 		time.Sleep(2 * time.Second)
 
 		// Daily Tweet Here

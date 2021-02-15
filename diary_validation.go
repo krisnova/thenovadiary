@@ -17,6 +17,7 @@ var (
 	// TODO Use reflection to pre-populate all
 	// functions that start with "v_"
 	validationChecks = []validationCheck{
+		v_emptyPhotoprismAlbum,
 		v_emptyPhotoprismUser,
 		v_emptyPhotoprismPass,
 		v_emptyPhotoprismConn,
@@ -97,7 +98,7 @@ func v_emptyTwitterConsumerKeySecret(cfg *DiaryConfig) string {
 
 func v_emptyPhotoprismAlbum(cfg *DiaryConfig) string {
 	if cfg.PhotoprismAlbum == "" {
-		cfg.PhotoprismAlbum = os.Getenv("DIARY_PHOTOPRISMUSER")
+		cfg.PhotoprismAlbum = os.Getenv("DIARY_PHOTOPRISMALBUM")
 	}
 	if cfg.PhotoprismAlbum == "" {
 		return ferr("Empty PhotoprismAlbum")

@@ -60,7 +60,7 @@ func (d *Diary) SendDailyTweet() error {
 
 	// ------- [ Auth Twitter Client ] ------
 	tURL := DefaultTwitterURL
-	if !BypassTwitter {
+	if !BypassSendDailyTweetTwitter {
 		cfg := d.config
 		tClient := anaconda.NewTwitterApiWithCredentials(cfg.TwitterToken, cfg.TwitterTokenSecret, cfg.TwitterConsumerKey, cfg.TwitterConsumerKeySecret)
 		tURL, err = SendPhotoTweet(tClient, photo, pBytes)
@@ -70,24 +70,26 @@ func (d *Diary) SendDailyTweet() error {
 	}
 
 	// ------- [ Photo Found, Tweet Sent (lol), Update Cache ] ------
-	logger.Debug("Syncing photo: %s", photo.PhotoUID)
-	data := GetCustomData(photo)
-	data.LastTweet = &today
-	photo, err = SetCustomData(data, photo)
-	if err != nil {
-		return err
+	if !BypassSendDailyTweetCache {
+		logger.Debug("Syncing photo: %s", photo.PhotoUID)
+		data := GetCustomData(photo)
+		data.LastTweet = &today
+		photo, err = SetCustomData(data, photo)
+		if err != nil {
+			return err
+		}
+		// Always set favorite == false
+		photo.PhotoFavorite = false
+		_, err = pClient.V1().UpdatePhoto(photo)
+		if err != nil {
+			return fmt.Errorf("unable to update photoprism photo: %v", err)
+		}
+		// ------- [ Update Records ] -------
+		cachedRecord.Value = today.String()
+		d.cache.Set(DailyTweetCacheKey, cachedRecord)
+		d.cache.Persist()
+		logger.Always("Successful Daily Tweet: %s", tURL)
 	}
-	// Always set favorite == false
-	photo.PhotoFavorite = false
-	_, err = pClient.V1().UpdatePhoto(photo)
-	if err != nil {
-		return fmt.Errorf("unable to update photoprism photo: %v", err)
-	}
-
-	// ------- [ Update Records ] -------
-	cachedRecord.Value = today.String()
-	d.cache.Set(DailyTweetCacheKey, cachedRecord)
-	d.cache.Persist()
-	logger.Always("Successful Daily Tweet: %s", tURL)
 	return nil
+
 }

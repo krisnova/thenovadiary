@@ -12,13 +12,6 @@ import (
 
 const (
 
-	// BypassTwitter
-	// This Flag is used to DEBUG the program
-	// and will simulate a successful API transaction
-	// without actually hitting the Twitter public
-	// API
-	BypassTwitter = false
-
 	// Default Twitter Values
 	// These are constants and if
 	// we every change our app account
@@ -33,7 +26,7 @@ const (
 // SendPhotoTweet will return the URL of the sent tweet and/or an
 // error.
 func SendPhotoTweet(twitter *anaconda.TwitterApi, photo api.Photo, pBytes []byte) (string, error) {
-	if BypassTwitter == true {
+	if BypassSendDailyTweetTwitter == true {
 		return "", nil
 	}
 	// TODO We should be memory conscience here
