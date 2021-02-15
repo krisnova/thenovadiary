@@ -75,7 +75,7 @@ func GetStatus(photo api.Photo) string {
 		metaFields = append(metaFields, fmt.Sprintf("%s Exposure", photo.PhotoExposure))
 	}
 	if photo.PhotoFNumber != 0 {
-		metaFields = append(metaFields, fmt.Sprintf("F %d", photo.PhotoFNumber))
+		metaFields = append(metaFields, fmt.Sprintf("F %f", photo.PhotoFNumber))
 	}
 	var status string
 	meta := strings.Join(metaFields, " ")

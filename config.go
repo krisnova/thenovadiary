@@ -7,12 +7,12 @@ const (
 	// BypassSendDailyTweetTwitter
 	//
 	// Bypass hitting the twitter API for the SendDailyTweet task
-	BypassSendDailyTweetTwitter = false
+	BypassSendDailyTweetTwitter = true
 
 	// BBypassSendDailyTweetCache
 	//
 	// Bypass saving the cache with an updated last tweet time
-	BypassSendDailyTweetCache = false
+	BypassSendDailyTweetCache = true
 )
 
 func DebugConfig() {
