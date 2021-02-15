@@ -82,7 +82,7 @@ func GetStatus(photo api.Photo) string {
 	if meta == "" {
 		status = photo.PhotoTitle
 	} else {
-		status = fmt.Sprintf("%s (%s)", photo.PhotoTitle, meta)
+		status = fmt.Sprintf("%s  \n\n [ %s ]", photo.PhotoTitle, meta)
 	}
 	if len(status) > TwitterLengthLimit {
 		if len(photo.PhotoTitle) < TwitterLengthLimit {
