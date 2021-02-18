@@ -18,13 +18,13 @@ type CustomData struct {
 	Description string
 }
 
-func SetCustomData(d *CustomData, photo api.Photo) (api.Photo, error) {
+func SetCustomData(d *CustomData, photo *api.Photo) error {
 	jBytes, err := json.Marshal(&d)
 	if err != nil {
-		return photo, fmt.Errorf("unable to set custom photo data: %v", err)
+		return fmt.Errorf("unable to set custom photo data: %v", err)
 	}
 	photo.PhotoDescription = string(jBytes)
-	return photo, nil
+	return nil
 }
 
 func GetCustomData(photo api.Photo) *CustomData {
@@ -40,14 +40,6 @@ func GetCustomData(photo api.Photo) *CustomData {
 	return d
 }
 
-// FindNextPhoto will list all photos and
-// linear search for a photo that was last
-// updated with the greatest delta in days
-// ago based on the timestamp found in
-//
-//
-// The function will return unprocessed
-// photos first by design.
 func FindNextPhotoInAlbum(client *photoprism.Client, albumID string) (*api.Photo, error) {
 	// TODO Nóva add pagination
 	photos, err := client.V1().GetPhotos(&api.PhotoOptions{
@@ -59,6 +51,18 @@ func FindNextPhotoInAlbum(client *photoprism.Client, albumID string) (*api.Photo
 	}
 	logger.Debug("Searching photo album: %s", albumID)
 	logger.Debug("Found %d photos to process", len(photos))
+	return FindPhoto(photos)
+}
+
+// FindNextPhoto will list all photos and
+// linear search for a photo that was last
+// updated with the greatest delta in days
+// ago based on the timestamp found in
+//
+//
+// The function will return unprocessed
+// photos first by design.
+func FindPhoto(photos []api.Photo) (*api.Photo, error) {
 
 	// --------------------------------------------------------------------------
 	//
@@ -87,8 +91,7 @@ func FindNextPhotoInAlbum(client *photoprism.Client, albumID string) (*api.Photo
 	}
 	if photoToTweet == nil {
 		return nil, fmt.Errorf(
-			"unable to find photo in album [$s] check for correct albumid and photos exist",
-			albumID)
+			"unable to find photo in album check for correct albumid and photos exist")
 	}
 	return photoToTweet, nil
 	//
@@ -99,7 +102,7 @@ func FindNextPhotoInAlbum(client *photoprism.Client, albumID string) (*api.Photo
 // The old Fisher–Yates shuffle
 func shufflePhotos(photos []api.Photo) []api.Photo {
 	rand.Seed(time.Now().UnixNano())
-	for i, _ := range photos {
+	for i := 0; i < len(photos); i++ {
 		j := rand.Intn(i + 1)
 		photos[i], photos[j] = photos[j], photos[i]
 	}
@@ -115,6 +118,7 @@ func findOldestPhoto(photos []api.Photo) *api.Photo {
 		if data.LastTweet != nil {
 			timeFromData := *data.LastTweet
 			pDelta := TimeDeltaDays(today, timeFromData)
+			logger.Info("[%s] delta(%d) pDelta(%d)", photo.PhotoTitle, delta, pDelta)
 			if pDelta > delta {
 				oldestPhoto = &photo
 			}

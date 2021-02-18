@@ -74,7 +74,7 @@ func (d *Diary) SendDailyTweet() error {
 		logger.Debug("Syncing photo: %s", photo.PhotoUID)
 		data := GetCustomData(photo)
 		data.LastTweet = &today
-		photo, err = SetCustomData(data, photo)
+		err = SetCustomData(data, &photo)
 		if err != nil {
 			return err
 		}
