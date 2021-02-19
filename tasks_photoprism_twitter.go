@@ -78,8 +78,6 @@ func (d *Diary) SendDailyTweet() error {
 		if err != nil {
 			return err
 		}
-		// Always set favorite == false
-		photo.PhotoFavorite = false
 		_, err = pClient.V1().UpdatePhoto(photo)
 		if err != nil {
 			return fmt.Errorf("unable to update photoprism photo: %v", err)

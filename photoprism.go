@@ -145,6 +145,7 @@ func findFirstFavoritePhoto(photos []api.Photo) *api.Photo {
 	for _, photo := range photos {
 		if photo.PhotoFavorite {
 			logger.Debug("Found first favorite photo: %s", photo.PhotoTitle)
+			photo.PhotoFavorite = false
 			return &photo
 		}
 	}

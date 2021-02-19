@@ -5,13 +5,12 @@ import (
 	"os"
 
 	"github.com/kris-nova/thenovadiary"
+	"github.com/urfave/cli"
 
 	"github.com/kris-nova/logger"
-
-	"github.com/urfave/cli"
 )
 
-func main() {
+func GetApp() *cli.App {
 	app := &cli.App{
 		Name: "DiaryApplication",
 		Flags: []cli.Flag{
@@ -19,55 +18,55 @@ func main() {
 				Name:        "puser",
 				Value:       "admin",
 				Usage:       "Used to pass a Photoprism sername at runtime.",
-				Destination: &diaryConfig.PhotoprismUser,
+				Destination: &DiaryConfig.PhotoprismUser,
 			},
 			&cli.StringFlag{
 				Name:        "ppass",
 				Value:       "",
 				Usage:       "Used to pass a Photoprism password secret at runtime.",
-				Destination: &diaryConfig.PhotoprismPass,
+				Destination: &DiaryConfig.PhotoprismPass,
 			},
 			&cli.StringFlag{
 				Name:        "pconn",
 				Value:       "",
 				Usage:       "Used to pass a Photoprism connection string at runtime.",
-				Destination: &diaryConfig.PhotoprismConn,
+				Destination: &DiaryConfig.PhotoprismConn,
 			},
 			&cli.StringFlag{
 				Name:        "palbum",
 				Value:       "",
 				Usage:       "Used to pass a Photoprism album id at runtime.",
-				Destination: &diaryConfig.PhotoprismAlbum,
+				Destination: &DiaryConfig.PhotoprismAlbum,
 			},
 			&cli.StringFlag{
 				Name:        "twtokensecret",
 				Value:       "",
 				Usage:       "Used to pass a Twitter token secret at runtime.",
-				Destination: &diaryConfig.TwitterTokenSecret,
+				Destination: &DiaryConfig.TwitterTokenSecret,
 			},
 			&cli.StringFlag{
 				Name:        "twtoken",
 				Value:       "",
 				Usage:       "Used to pass a Twitter token at runtime.",
-				Destination: &diaryConfig.TwitterToken,
+				Destination: &DiaryConfig.TwitterToken,
 			},
 			&cli.StringFlag{
 				Name:        "twconsumersecret",
 				Value:       "",
 				Usage:       "Used to pass a Twitter consumer key secret at runtime.",
-				Destination: &diaryConfig.TwitterConsumerKeySecret,
+				Destination: &DiaryConfig.TwitterConsumerKeySecret,
 			},
 			&cli.StringFlag{
 				Name:        "twconsumer",
 				Value:       "",
 				Usage:       "Used to pass a Twitter consumer key at runtime.",
-				Destination: &diaryConfig.TwitterConsumerKey,
+				Destination: &DiaryConfig.TwitterConsumerKey,
 			},
 			&cli.StringFlag{
 				Name:        "name",
 				Value:       "Nova",
 				Usage:       "A unique name for this particular set of actions.",
-				Destination: &diaryConfig.Name,
+				Destination: &DiaryConfig.Name,
 			},
 			&cli.IntFlag{
 				Name:        "verbose",
@@ -77,17 +76,21 @@ func main() {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			return RunDiary(diaryConfig)
+			return RunDiary(DiaryConfig)
 		},
 	}
+	return app
+}
 
+func main() {
+	app := GetApp()
 	err := app.Run(os.Args)
 	if err != nil {
 		logger.Critical("Error running application: %v", err.Error())
 	}
 }
 
-var diaryConfig = &thenovadiary.DiaryConfig{
+var DiaryConfig = &thenovadiary.DiaryConfig{
 	//
 }
 
